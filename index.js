@@ -50,8 +50,24 @@ async function run() {
       res.send(result);
     });
 
+    // Update a Product
+    app.put("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedProduct = req.body;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updatedDoc = {
+        $set: updatedProduct,
+      };
+      const result = await productsCollection.updateOne(
+        filter,
+        updatedDoc,
+        options
+      );
+      res.send(result);
+    });
+  
     
-
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
