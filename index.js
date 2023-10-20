@@ -74,7 +74,20 @@ async function run() {
       res.send(result);
     })
 
-  
+    // get cart
+    app.get("/carts", async (req, res) => {
+      const cursor = cartsCollection.find({});
+      const carts = await cursor.toArray();
+      res.send(carts);
+    })
+
+    // delete cart
+    app.delete("/carts/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await cartsCollection.deleteOne(query);
+      res.send(result);
+    })
 
 
     // Send a ping to confirm a successful connection
