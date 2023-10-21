@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const cors = require('cors');
 const port = process.env.PORT || 5000;
@@ -23,7 +23,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
- 
+
     await client.connect();
     const productsCollection = client.db("techmart").collection("products");
     const cartsCollection = client.db("techmart").collection("carts");
@@ -34,18 +34,20 @@ async function run() {
       const products = await cursor.toArray();
       res.send(products);
     });
-   
+
     // Get Single Product
     app.get("/products/:id", async (req, res) => {
       const id = req.params.id;
-      const query = { _id: ObjectId(id) };
+      const query = { _id: new ObjectId(id) };
       const product = await productsCollection.findOne(query);
       res.send(product);
     });
 
+
     // Post a Product
     app.post("/products", async (req, res) => {
       const product = req.body;
+      console.log("hit the post api", product);
       const result = await productsCollection.insertOne(product);
       res.send(result);
     });
@@ -54,7 +56,7 @@ async function run() {
     app.put("/products/:id", async (req, res) => {
       const id = req.params.id;
       const updatedProduct = req.body;
-      const filter = { _id: ObjectId(id) };
+      const filter = { _id: new ObjectId(id) };
       const options = { upsert: true };
       const updatedDoc = {
         $set: updatedProduct,
@@ -66,7 +68,8 @@ async function run() {
       );
       res.send(result);
     });
-  
+
+
     // add to cart
     app.post("/carts", async (req, res) => {
       const cart = req.body;
@@ -84,7 +87,7 @@ async function run() {
     // delete cart
     app.delete("/carts/:id", async (req, res) => {
       const id = req.params.id;
-      const query = { _id: ObjectId(id) };
+      const query = { _id: new ObjectId(id) };
       const result = await cartsCollection.deleteOne(query);
       res.send(result);
     })
